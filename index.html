@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>C340 Performance Computation</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png">
+</head>
+<body>
+<main id="app" style="padding-top: 10px">
+    <div class="takeoff-info">
+        <h2>Takeoff Performance Data</h2>
+        <table style="width: 100%">
+            <tr>
+                <td class="takeoff-section">
+                    <table>
+                        <tr><td colspan="2"><h3>Inputs</h3></td></tr>
+                        <tr><td class="td-input-label">Takeoff Weight</td><td class="td-input-value"><input type="text" id="takeoff_weight" value="0" size="7"></td></tr>
+                        <tr><td class="td-input-label">Temperature (&deg;C)</td><td class="td-input-value"><input type="text" id="takeoff_temp" value="15" size="7"></td></tr>
+                        <tr><td class="td-input-label">Field Elevation (ft)</td><td class="td-input-value"><input type="text" id="takeoff_alt" value="0" size="7"></td></tr>
+                        <tr><td class="td-input-label">Altimeter (in)</td><td class="td-input-value"><input type="text" id="takeoff_press" value="29.92" size="7"></td></tr>
+                        <tr><td class="td-input-label">Runway</td><td class="td-input-value"><input type="text" id="takeoff_rwh" value="36" size="7"></td></tr>
+                        <tr><td class="td-input-label">Wind Heading (&deg;Mag)</td><td class="td-input-value"><input type="text" id="takeoff_wh" value="0" size="7"></td></tr>
+                        <tr>
+                            <td id="var_wind_box" class="bordered" colspan="2">
+                            <table style="width: 100%">
+                                <tr><td class="td-input-label">Variable</td><td class="td-input-value"><input type="checkbox" id="takeoff_wvar" value="0"></td></tr>
+                                <tr id="wvar-from-row"><td class="td-input-label">From (&deg;Mag)</td><td class="td-input-value"><input type="text" id="takeoff_wvar_from" value="0" size="7"></td></tr>
+                                <tr id="wvar-to-row"><td class="td-input-label">To (&deg;Mag)</td><td class="td-input-value"><input type="text" id="takeoff_wvar_to" value="0" size="7"></td></tr>
+                            </table>
+                            </td>
+                        </tr>
+                        <tr><td class="td-input-label">Wind Speed (kt)</td><td class="td-input-value"><input type="text" id="takeoff_ws" value="0" size="7"></td></tr>
+                        <tr><td class="td-input-label">Gusting To (kt)</td><td class="td-input-value"><input type="text" id="takeoff_wsg" value="0" size="7"></td></tr>
+                        <tr><td class="td-input-label">Margin (%)</td><td class="td-input-value"><input type="text" id="takeoff_margin" value="0" size="7"></td></tr>
+                    </table>
+                </td>
+                <td class="takeoff-section">
+                    <table>
+                        <tr><td colspan="2"><h3>Performance</h3></td></tr>
+                        <tr><td class="td-input-label">Headwind (kt)</td><td id="perf_headwind"></td></tr>
+                        <tr><td class="td-input-label">Crosswind (kt)</td><td id="perf_crosswind"></td></tr>
+                        <tr><td class="td-input-label">Takeoff Speed (KIAS)</td><td id="perf_speed"></td></tr>
+                        <tr><td class="td-input-label">Ground Roll (Feet)</td><td id="perf_ground_roll"></td></tr>
+                        <tr><td class="td-input-label">Clear 50' Obstacle (Feet)</td><td id="perf_obst"></td></tr>
+                        <tr><td class="td-input-label">Accelerate-Stop (Feet)</td><td id="perf_ac_stop"></td></tr>
+                        <tr><td class="td-input-label">Accelerate-Go (Feet)</td><td id="perf_ac_go"></td></tr>
+                        <tr><td class="td-input-label">Blue Line (KIAS)</td><td id="perf_blue_line_speed"></td></tr>
+                        <tr><td class="td-input-label">Blue Line Climb (ft/min)</td><td id="perf_blue_line_climb"></td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <p></p>
+    <div class="landing-info">
+        <h2>Landing Performance Data</h2>
+        <table style="width: 100%">
+            <tr>
+                <td class="landing-section">
+                    <table>
+                        <tr><td colspan="2"><h3>Inputs</h3></td></tr>
+                        <tr><td class="td-input-label">Landing Weight</td><td class="td-input-value"><input type="text" id="landing_weight" value="0" size="7"></td></tr>
+                        <tr><td class="td-input-label">Temperature (&deg;C)</td><td class="td-input-value"><input type="text" id="landing_temp" value="15" size="7"></td></tr>
+                        <tr><td class="td-input-label">Field Elevation (ft)</td><td class="td-input-value"><input type="text" id="landing_alt" value="0" size="7"></td></tr>
+                        <tr><td class="td-input-label">Altimeter (in)</td><td class="td-input-value"><input type="text" id="landing_press" value="29.92" size="7"></td></tr>
+                        <tr><td class="td-input-label">Runway</td><td class="td-input-value"><input type="text" id="landing_rwh" value="36" size="7"></td></tr>
+                        <tr><td class="td-input-label">Flaps</td>
+                            <td class="td-input-value">
+                                <select id="landing_flaps">
+                                    <option value="0">UP</option>
+                                    <option value="15">15&deg;</option>
+                                    <option value="30">30&deg;</option>
+                                    <option value="45">45&deg;</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr><td class="td-input-label">Wind Heading (&deg;Mag)</td><td class="td-input-value"><input type="text" id="landing_wh" value="0" size="7"></td></tr>
+                        <tr>
+                            <td id="ldg_var_wind_box" class="bordered" colspan="2">
+                                <table style="width: 100%">
+                                    <tr><td class="td-input-label">Variable</td><td class="td-input-value"><input type="checkbox" id="landing_wvar" value="0"></td></tr>
+                                    <tr id="ldg-wvar-from-row"><td class="td-input-label">From (&deg;Mag)</td><td class="td-input-value"><input type="text" id="landing_wvar_from" value="0" size="7"></td></tr>
+                                    <tr id="ldg-wvar-to-row"><td class="td-input-label">To (&deg;Mag)</td><td class="td-input-value"><input type="text" id="landing_wvar_to" value="0" size="7"></td></tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr><td class="td-input-label">Wind Speed (kt)</td><td class="td-input-value"><input type="text" id="landing_ws" value="0" size="7"></td></tr>
+                        <tr><td class="td-input-label">Gusting To (kt)</td><td class="td-input-value"><input type="text" id="landing_wsg" value="0" size="7"></td></tr>
+                        <tr><td class="td-input-label">Margin (%)</td><td class="td-input-value"><input type="text" id="landing_margin" value="0" size="7"></td></tr>
+                    </table>
+                </td>
+                <td class="landing-section">
+                    <table>
+                        <tr><td colspan="2"><h3>Performance</h3></td></tr>
+                        <tr><td class="td-input-label">Headwind (kt)</td><td id="ldg_perf_headwind"></td></tr>
+                        <tr><td class="td-input-label">Crosswind (kt)</td><td id="ldg_perf_crosswind"></td></tr>
+                        <tr><td class="td-input-label">Vref Speed (KIAS)</td><td id="ldg_perf_speed"></td></tr>
+                        <tr><td class="td-input-label">Ground Roll (Feet)</td><td id="ldg_perf_ground_roll"></td></tr>
+                        <tr><td class="td-input-label">Clear 50' Obstacle (Feet)</td><td id="ldg_perf_obst"></td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</main>
+<script type="module" src="/src/utils.ts"></script>
+<script type="module" src="/src/blueline_data.ts"></script>
+<script type="module" src="/src/takeoff_data.ts"></script>
+<script type="module" src="/src/landing_data.ts"></script>
+<script type="module" src="/src/takeoff_computer.ts"></script>
+<script type="module" src="/src/landing_computer.ts"></script>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
