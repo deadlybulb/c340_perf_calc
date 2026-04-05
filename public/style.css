@@ -112,6 +112,24 @@ img {
     border-radius: 10px;
 }
 
+.normal-limit {
+    color: rgba(0, 255, 0, 1);
+}
+
+.warning-limit {
+    color: rgba(255, 255, 0, 1);
+    font-size: xx-large;
+}
+
+.bad-limit {
+    color: rgba(255, 0, 0, 1);
+    font-size: xx-large;
+}
+
+.neutral-limit {
+    color: rgba(0, 255, 255, 1);
+}
+
 .landing-info {
     padding-left: 10px;
     padding-right: 10px;

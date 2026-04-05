@@ -11,17 +11,30 @@
 <body>
 <main id="app" style="padding-top: 10px">
     <div class="takeoff-info">
+        <h3>Airport Data as of <span id="airport_data_date"></span></h3>
+    </div>
+    <p></p>
+    <div class="takeoff-info">
         <h2>Takeoff Performance Data</h2>
         <table style="width: 100%">
             <tr>
                 <td class="takeoff-section">
                     <table>
                         <tr><td colspan="2"><h3>Inputs</h3></td></tr>
+                        <tr><td class="td-input-label">Airport ID</td><td class="td-input-value"><input type="text" id="takeoff_apt" value="" size="7"></td></tr>
                         <tr><td class="td-input-label">Takeoff Weight</td><td class="td-input-value"><input type="text" id="takeoff_weight" value="0" size="7"></td></tr>
                         <tr><td class="td-input-label">Temperature (&deg;C)</td><td class="td-input-value"><input type="text" id="takeoff_temp" value="15" size="7"></td></tr>
                         <tr><td class="td-input-label">Field Elevation (ft)</td><td class="td-input-value"><input type="text" id="takeoff_alt" value="0" size="7"></td></tr>
                         <tr><td class="td-input-label">Altimeter (in)</td><td class="td-input-value"><input type="text" id="takeoff_press" value="29.92" size="7"></td></tr>
-                        <tr><td class="td-input-label">Runway</td><td class="td-input-value"><input type="text" id="takeoff_rwh" value="36" size="7"></td></tr>
+                        <tr><td class="td-input-label">Runway</td>
+                            <td class="td-input-value">
+                                <input type="text" id="takeoff_rwh" value="36" size="7">
+                                <select id="takeoff_rwh_apt">
+                                    <option value="0">R1</option>
+                                    <option value="1">R2</option>
+                                </select>
+                            </td>
+                        </tr>
                         <tr><td class="td-input-label">Wind Heading (&deg;Mag)</td><td class="td-input-value"><input type="text" id="takeoff_wh" value="0" size="7"></td></tr>
                         <tr>
                             <td id="var_wind_box" class="bordered" colspan="2">
@@ -51,6 +64,17 @@
                         <tr><td class="td-input-label">Blue Line Climb (ft/min)</td><td id="perf_blue_line_climb"></td></tr>
                     </table>
                 </td>
+                <td class="takeoff-section">
+                    <table>
+                        <tr><td colspan="2"><h3>Limits</h3></td></tr>
+                        <tr><td class="td-input-label">Takeoff Airport</td><td id="to_airport" style="text-align: left"></td></tr>
+                        <tr><td class="td-input-label">Elevation</td><td id="to_elevation" style="text-align: left"></td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td class="td-input-label">TODA</td><td id="to_toda" style="text-align: left"></td></tr>
+                        <tr><td class="td-input-label">ASDA</td><td id="to_asda" style="text-align: left"></td></tr>
+                    </table>
+                </td>
             </tr>
         </table>
     </div>
@@ -62,11 +86,20 @@
                 <td class="landing-section">
                     <table>
                         <tr><td colspan="2"><h3>Inputs</h3></td></tr>
+                        <tr><td class="td-input-label">Airport ID</td><td class="td-input-value"><input type="text" id="landing_apt" value="" size="7"></td></tr>
                         <tr><td class="td-input-label">Landing Weight</td><td class="td-input-value"><input type="text" id="landing_weight" value="0" size="7"></td></tr>
                         <tr><td class="td-input-label">Temperature (&deg;C)</td><td class="td-input-value"><input type="text" id="landing_temp" value="15" size="7"></td></tr>
                         <tr><td class="td-input-label">Field Elevation (ft)</td><td class="td-input-value"><input type="text" id="landing_alt" value="0" size="7"></td></tr>
                         <tr><td class="td-input-label">Altimeter (in)</td><td class="td-input-value"><input type="text" id="landing_press" value="29.92" size="7"></td></tr>
-                        <tr><td class="td-input-label">Runway</td><td class="td-input-value"><input type="text" id="landing_rwh" value="36" size="7"></td></tr>
+                        <tr><td class="td-input-label">Runway</td>
+                            <td class="td-input-value">
+                                <input type="text" id="landing_rwh" value="36" size="7">
+                                <select id="landing_rwh_apt">
+                                    <option value="0">R1</option>
+                                    <option value="1">R2</option>
+                                </select>
+                            </td>
+                        </tr>
                         <tr><td class="td-input-label">Flaps</td>
                             <td class="td-input-value">
                                 <select id="landing_flaps">
@@ -102,11 +135,23 @@
                         <tr><td class="td-input-label">Clear 50' Obstacle (Feet)</td><td id="ldg_perf_obst"></td></tr>
                     </table>
                 </td>
+                <td class="landing-section">
+                    <table>
+                        <tr><td colspan="2"><h3>Limits</h3></td></tr>
+                        <tr><td class="td-input-label">Landing Airport</td><td id="ldg_airport" style="text-align: left"></td></tr>
+                        <tr><td class="td-input-label">Elevation</td><td id="ldg_elevation" style="text-align: left"></td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td>&nbsp;</td></tr>
+                        <tr><td class="td-input-label">LDA</td><td id="ldg_lda" style="text-align: left"></td></tr>
+                    </table>
+                </td>
+
             </tr>
         </table>
     </div>
 </main>
 <script type="module" src="/src/utils.ts"></script>
+<script type="module" src="/src/airport_data.ts"></script>
 <script type="module" src="/src/blueline_data.ts"></script>
 <script type="module" src="/src/takeoff_data.ts"></script>
 <script type="module" src="/src/landing_data.ts"></script>

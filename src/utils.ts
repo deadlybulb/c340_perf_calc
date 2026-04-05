@@ -33,8 +33,7 @@ export function computeWindOffset(runway_heading: number, windDirection: number)
 
 // Compute wind components based on runway heading and wind.
 // This function does not validate input parameters.
-export function computeWindComponents(runway: number, windDirection: number, windSpeed: number, gustSpeed: number) {
-    const runway_heading = runway * 10;
+export function computeWindComponents(runway_heading: number, windDirection: number, windSpeed: number, gustSpeed: number) {
     const offset = computeWindOffset(runway_heading, windDirection);
     const headwind = windSpeed * Math.cos(offset * Math.PI / 180);
     const crosswind = windSpeed * Math.sin(offset * Math.PI / 180);

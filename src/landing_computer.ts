@@ -13,6 +13,16 @@
 
 import { boundGtEqZero, boundInterval, WindComponents, computeWindComponents, computeWindOffset } from './utils';
 import { computeLandingData, computeLandingHeadwindCorrection, computeLandingFlapsDistanceCorrection, computeLandingFlapsVrefCorrection} from './landing_data.ts';
+import {
+  apt_ELEV_OFFSET,
+  apt_MAG_VAR_OFFSET,
+  apt_NAME_OFFSET,
+  apt_RUNWAY_ID_OFFSET,
+  apt_RUNWAY_LDA_OFFSET,
+  apt_RUNWAY_TH_OFFSET,
+  apt_RUNWAYS_OFFSET,
+  getAirportData,
+} from './airport_data.ts';
 
 function toggleVariableWinds(show: boolean) {
     if (show) {
@@ -27,6 +37,7 @@ function toggleVariableWinds(show: boolean) {
 }
 
 function initInputs() {
+    (document.getElementById('landing_apt') as HTMLInputElement).value = '';
     (document.getElementById('landing_weight') as HTMLInputElement).value = '0';
     (document.getElementById('landing_temp') as HTMLInputElement).value = '15';
     (document.getElementById('landing_alt') as HTMLInputElement).value = '0';
@@ -41,9 +52,97 @@ function initInputs() {
     (document.getElementById('landing_wsg') as HTMLInputElement).value = '0';
     (document.getElementById('landing_margin') as HTMLInputElement).value = '0';
     toggleVariableWinds(false);
+    updateWithLandingAirport();
+}
+
+function updateLandingAirportSelectedRunway() {
+  // Connect the event handler so we populate LDA from the selected runway.
+  const el_landing_rwh_apt = document.getElementById('landing_rwh_apt') as HTMLSelectElement;
+  const el_landing_apt = document.getElementById('landing_apt') as HTMLInputElement;
+  const apt_code = el_landing_apt.value;
+  const apt_data = getAirportData(apt_code);
+  const rwh_sel = el_landing_rwh_apt.value;
+  if (apt_data) {
+    const rwh_data = apt_data[apt_RUNWAYS_OFFSET].find((rwh: [string, number, number, number, number, number]) => rwh[apt_RUNWAY_ID_OFFSET] == rwh_sel);
+    if (rwh_data) {
+      const el_to_lda = document.getElementById('ldg_lda');
+      if (el_to_lda) el_to_lda.innerHTML = rwh_data[apt_RUNWAY_LDA_OFFSET].toString();
+    }
+  }
+}
+
+function updateWithLandingAirport() {
+  // Check if entered value is an airport we have info for.
+  const el_landing_apt = document.getElementById('landing_apt') as HTMLInputElement;
+  el_landing_apt.value = el_landing_apt.value.toUpperCase();
+  const apt_code = el_landing_apt.value;
+  const apt_data = getAirportData(apt_code);
+  const el_ldg_airport = document.getElementById('ldg_airport');
+  const el_ldg_elevation = document.getElementById('ldg_elevation');
+  const el_ldg_lda = document.getElementById('ldg_lda');
+  const el_landing_rwh = document.getElementById('landing_rwh');
+  const el_landing_rwh_apt = document.getElementById('landing_rwh_apt') as HTMLSelectElement;
+  if (apt_data) {
+    // Expose airport name and elevation
+    if (el_ldg_airport) {
+      el_ldg_airport.innerHTML = apt_data[apt_NAME_OFFSET];
+      el_ldg_airport.className = 'neutral-limit';
+    }
+    if (el_ldg_elevation) {
+      el_ldg_elevation.innerHTML = apt_data[apt_ELEV_OFFSET];
+      el_ldg_elevation.className = 'neutral-limit';
+      const el_landing_alt = document.getElementById('landing_alt') as HTMLInputElement;
+      if (el_landing_alt) {
+        el_landing_alt.value = apt_data[apt_ELEV_OFFSET];
+      }
+    }
+    // Populate takeoff runway select and hide text entry
+    if (el_landing_rwh) {
+      el_landing_rwh.style.display = 'none';
+    }
+    if (el_landing_rwh_apt) {
+      el_landing_rwh_apt.style.display = 'inline';
+      el_landing_rwh_apt.innerHTML = '';
+      for (let i = 0; i < apt_data[apt_RUNWAYS_OFFSET].length; i+=1) {
+        const option = document.createElement('option');
+        option.value = apt_data[apt_RUNWAYS_OFFSET][i][apt_RUNWAY_ID_OFFSET];
+        option.innerHTML = apt_data[apt_RUNWAYS_OFFSET][i][apt_RUNWAY_ID_OFFSET];
+        el_landing_rwh_apt.add(option);
+      }
+      el_landing_rwh_apt.value = apt_data[apt_RUNWAYS_OFFSET][0][apt_RUNWAY_ID_OFFSET];
+      updateLandingAirportSelectedRunway();
+    }
+  } else {
+    // Set limits to N/A
+    if (el_ldg_airport) {
+      el_ldg_airport.innerHTML = 'N/A';
+      el_ldg_airport.className = 'neutral-limit';
+    }
+    if (el_ldg_elevation) {
+      el_ldg_elevation.innerHTML = 'N/A';
+      el_ldg_elevation.className = 'neutral-limit';
+    }
+    if (el_ldg_lda) {
+      el_ldg_lda.innerHTML = 'N/A';
+      el_ldg_lda.className = 'neutral-limit';
+    }
+    // Hide takeoff runway selector and show text entry
+    if (el_landing_rwh) {
+      el_landing_rwh.style.display = 'inline';
+    }
+    if (el_landing_rwh_apt) {
+      el_landing_rwh_apt.style.display = 'none';
+    }
+  }
 }
 
 function initValidators() {
+    const el_landing_apt = document.getElementById('landing_apt') as HTMLInputElement;
+    el_landing_apt.addEventListener('change', () => { updateWithLandingAirport()});
+
+    const el_landing_rwh_apt = document.getElementById('landing_rwh_apt') as HTMLSelectElement;
+    el_landing_rwh_apt.addEventListener('change', () => { updateLandingAirportSelectedRunway()});
+
     const el_landing_weight = document.getElementById('landing_weight') as HTMLInputElement;
     el_landing_weight.addEventListener('change', () => {
         el_landing_weight.value = boundGtEqZero(parseInt(el_landing_weight.value)).toString();
@@ -116,11 +215,25 @@ function initValidators() {
 function gatherInputs() : LandingInputs {
     const inputs = new LandingInputs();
 
+    // Check whether an airport ID has been set and if so extract the selected runway info.
+    const el_landing_apt = document.getElementById('landing_apt') as HTMLInputElement;
+    const apt_data = getAirportData(el_landing_apt.value);
+    var rwh_data = null;
+    if (apt_data) {
+      const el_landing_rwh_apt = document.getElementById('landing_rwh_apt') as HTMLSelectElement;
+      const rwh_sel = el_landing_rwh_apt.value;
+      rwh_data = apt_data[apt_RUNWAYS_OFFSET].find((rwh: [string, number, number, number, number, number]) => rwh[apt_RUNWAY_ID_OFFSET] == rwh_sel);
+    }
+
     inputs.landingWeight = parseInt((document.getElementById('landing_weight') as HTMLInputElement).value);
     inputs.temperature = parseInt((document.getElementById('landing_temp') as HTMLInputElement).value);
     inputs.fieldElevation = parseInt((document.getElementById('landing_alt') as HTMLInputElement).value);
     inputs.altimeter = parseFloat((document.getElementById('landing_press') as HTMLInputElement).value);
-    inputs.runway = parseInt((document.getElementById('landing_rwh') as HTMLInputElement).value);
+    if (apt_data && rwh_data) {
+      inputs.runway = apt_data[apt_MAG_VAR_OFFSET] + rwh_data[apt_RUNWAY_TH_OFFSET];
+    } else {
+      inputs.runway = parseInt((document.getElementById('landing_rwh') as HTMLInputElement).value) * 10;
+    }
     inputs.flaps = parseInt((document.getElementById('landing_flaps') as HTMLSelectElement).value);
     inputs.windDirection = parseInt((document.getElementById('landing_wh') as HTMLInputElement).value);
     inputs.variableWinds = (document.getElementById('landing_wvar') as HTMLInputElement).checked;
@@ -137,7 +250,7 @@ function gatherInputs() : LandingInputs {
         let offset = 0;
         if (inputs.variableEnd >= inputs.variableStart) {
             for (let i = inputs.variableStart; i <= inputs.variableEnd; i+=10) {
-                let next_offset = computeWindOffset(inputs.runway * 10, i);
+                let next_offset = computeWindOffset(inputs.runway, i);
                 if (next_offset > offset) {
                     wind_cand = i;
                     offset = next_offset;
@@ -145,14 +258,14 @@ function gatherInputs() : LandingInputs {
             }
         } else {
             for (let i = inputs.variableStart; i <= 360; i+=10) {
-                let next_offset = computeWindOffset(inputs.runway * 10, i);
+                let next_offset = computeWindOffset(inputs.runway, i);
                 if (next_offset > offset) {
                     wind_cand = i;
                     offset = next_offset;
                 }
             }
             for (let i = 0; i <= inputs.variableEnd; i+=10) {
-                let next_offset = computeWindOffset(inputs.runway * 10, i);
+                let next_offset = computeWindOffset(inputs.runway, i);
                 if (next_offset > offset) {
                     wind_cand = i;
                     offset = next_offset;
@@ -210,10 +323,37 @@ function computeAndDisplayPerformance() {
     if (perf_obstacle) {
         perf_obstacle.innerHTML = Math.round(ldgData.distanceToClearObstacle * hwCorr * flapsDistCorr * marginFactor).toString();
     }
+
+    // If a landing airport is specified, then highlight any limits which exceed as follows:
+    // - If performance value exceeds the limit, then color as "bad"
+    // - If performance value is within 'warning_margin' of limit, then color as "warning"
+    // - Otherwise, color as "normal"
+    const el_landing_apt = document.getElementById('landing_apt') as HTMLInputElement;
+    const apt_data = getAirportData(el_landing_apt.value);
+    if (apt_data) {
+      const warning_margin = 0.05;
+      const el_landing_rwh_apt = document.getElementById('landing_rwh_apt') as HTMLSelectElement;
+      const rwh_sel = el_landing_rwh_apt.value;
+      const rwh_data = apt_data[apt_RUNWAYS_OFFSET].find((rwh: [string, number, number, number, number, number]) => rwh[apt_RUNWAY_ID_OFFSET] == rwh_sel);
+      if (rwh_data) {
+        const limit_lda = rwh_data[apt_RUNWAY_LDA_OFFSET];
+        const perf_obst = ldgData.distanceToClearObstacle * hwCorr * flapsDistCorr * marginFactor;
+        const el_ldg_lda = document.getElementById('ldg_lda');
+        if (el_ldg_lda) {
+          el_ldg_lda.className = limit_lda < perf_obst ? 'bad-limit' :
+            (limit_lda - perf_obst > limit_lda * warning_margin
+              ? 'normal-limit'
+              : 'warning-limit');
+        }
+      }
+    }
+
 }
 
 function initPerformanceComputer() {
     let elArray = [
+        document.getElementById('landing_apt'),
+        document.getElementById('landing_rwh_apt'),
         document.getElementById('landing_weight'),
         document.getElementById('landing_temp'),
         document.getElementById('landing_alt'),
@@ -253,21 +393,21 @@ export function setupLanding() {
 
 class LandingInputs {
     // Taken from the UI.
-    landingWeight: number;
-    temperature: number;
-    fieldElevation: number;
-    altimeter: number;
-    runway: number;
-    flaps: number;
-    windDirection: number;
-    windSpeed: number;
-    gustSpeed: number;
-    variableWinds: boolean;
-    variableStart: number; // windDirection where variable winds start
-    variableEnd: number; // windDirection where variable winds end
-    margin: number;
+    landingWeight: number = 0;
+    temperature: number = 0;
+    fieldElevation: number = 0;
+    altimeter: number = 0;
+    runway: number = 0;
+    flaps: number = 0;
+    windDirection: number = 0;
+    windSpeed: number = 0;
+    gustSpeed: number = 0;
+    variableWinds: boolean = false;
+    variableStart: number = 0; // windDirection where variable winds start
+    variableEnd: number = 0; // windDirection where variable winds end
+    margin: number = 0;
 
     // Computed
-    windComponents: WindComponents;
+    windComponents: WindComponents = new WindComponents();
 }
 
