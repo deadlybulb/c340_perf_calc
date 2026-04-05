@@ -13,29 +13,29 @@
 // We provide a few convenient mappings to simplify the computation of performance data.  Namely:
 //   takeoff weight -> pressure altitude -> outside temperature -> performance entry
 
-// We provide modification functions to adjust data values according to headwind or tailwind component.
+// We provide modification functions to adjust data values according to the headwind or tailwind component.
 // These adjustments are in the notes section of the tables in the POH.
 
 import { computeBluelineSpeed, computeBluelineClimb } from "./blueline_data.ts";
 
 class TakeoffPerformance {
-    speed: number;
-    distance: number;
+    speed: number = 0;
+    distance: number = 0;
 }
 
 export class NormalTakeoffData {
-    takeoffSpeed: number;
-    groundRoll: number;
-    distanceToClearObstacle: number;
-    accelerateStop: number;
-    accelerateGo: number;
-    blueLineSpeed: number;
-    blueLineClimb: number;
+    takeoffSpeed: number = 0;
+    groundRoll: number = 0;
+    distanceToClearObstacle: number = 0;
+    accelerateStop: number = 0;
+    accelerateGo: number = 0;
+    blueLineSpeed: number = 0;
+    blueLineClimb: number = 0;
 }
 
 // TODO: Add source data for max gross up to 6390
 
-const normalTakeoffGroundRollData = [
+const normalTakeoffGroundRollData : any[] = [
     [5990, [ 91, [
         [-20 , [ 1190, 1260, 1340, 1420, 1510, 1610, 1710, 1850, 1970, 2100, 2240 ]],
         [-10 , [ 1300, 1380, 1470, 1560, 1650, 1760, 1910, 2030, 2160, 2300, 2460 ]],
@@ -65,7 +65,7 @@ const normalTakeoffGroundRollData = [
     ]]]
 ];
 
-const normalTakeoffObstClearanceData = [
+const normalTakeoffObstClearanceData : any[] = [
     [5990, [ 91, [
         [-20 , [ 1570, 1650, 1750, 1850, 1950, 2070, 2200, 2360, 2510, 2660, 2840 ]],
         [-10 , [ 1720, 1810, 1920, 2030, 2150, 2280, 2450, 2600, 2770, 2950, 3140 ]],
@@ -231,7 +231,7 @@ function computeTakeoffPerformance(srcData : any, takeoff_weight : number, press
     // +-------------------------------------------+-------------------------------------------+
     // | lower weight, lower temp, interp altitude | lower weight, upper temp, interp altitude |
     // +---------------------------------------------------------------------------------------+
-    let comp_mat = [[], []];
+    let comp_mat : number[][] = [[], []];
     comp_mat[0][0] = up_dntemp_bound[1][lower_altitude] + altitude_ratio * (up_dntemp_bound[1][upper_altitude] - up_dntemp_bound[1][lower_altitude]);
     comp_mat[0][1] = up_uptemp_bound[1][lower_altitude] + altitude_ratio * (up_uptemp_bound[1][upper_altitude] - up_uptemp_bound[1][lower_altitude]);
     comp_mat[1][0] = dn_dntemp_bound[1][lower_altitude] + altitude_ratio * (dn_dntemp_bound[1][upper_altitude] - dn_dntemp_bound[1][lower_altitude]);
@@ -267,7 +267,7 @@ export function computeTakeoffHeadwindCorrection(headwind : number) : number {
     return 1 - (0.05 * headwind/2);
 }
 
-// Return factor to multiply by accelerate stop distance based on headwind.
+// Return factor to multiply by accelerate-stop distance based on headwind.
 // A tailwind can be specified with a negative headwind value.
 export function computeAccelerateStopHeadwindCorrection(headwind : number) : number {
     if (headwind == 0) return 1;
@@ -276,7 +276,7 @@ export function computeAccelerateStopHeadwindCorrection(headwind : number) : num
     return 1 - (0.05 * headwind/2);
 }
 
-// Return factor to multiply by accelerate go distance based on headwind.
+// Return factor to multiply by accelerate-go distance based on headwind.
 // A tailwind can be specified with a negative headwind value.
 export function computeAccelerateGoHeadwindCorrection(headwind : number) : number {
     if (headwind == 0) return 1;

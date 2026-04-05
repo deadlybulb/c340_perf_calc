@@ -230,7 +230,7 @@ function gatherInputs() : TakeoffInputs {
     // Check whether an airport ID has been set and if so extract the selected runway info.
     const el_takeoff_apt = document.getElementById('takeoff_apt') as HTMLInputElement;
     const apt_data = getAirportData(el_takeoff_apt.value);
-    var rwh_data = null;
+    let rwh_data = null;
     if (apt_data) {
       const el_takeoff_rwh_apt = document.getElementById('takeoff_rwh_apt') as HTMLSelectElement;
       const rwh_sel = el_takeoff_rwh_apt.value;

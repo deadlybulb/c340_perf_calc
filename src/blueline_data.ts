@@ -4,14 +4,14 @@
 // @date: 2025-09-18
 // @version: 1.0
 
-const bluelineSpeedData = [
+const bluelineSpeedData : any[] = [
     [5990, [100, 98, 97]],
     [5500, [ 97, 96, 95]],
     [5000, [ 95, 94, 93]],
     [4500, [ 93, 92, 91]]
 ];
 
-const bluelineClimbData = [
+const bluelineClimbData : any[] = [
     [5990, [
         [-40 , [ 600, 540, 480, 420, 380, 310, 250, 200, 140, 80, 40 ]],
         [-30 , [ 550, 490, 430, 370, 320, 260, 210, 160, 100, 50, 0 ]],
@@ -183,7 +183,7 @@ export function computeBluelineClimb(takeoff_weight : number, pressure_alt : num
     // +-------------------------------------------+-------------------------------------------+
     // | lower weight, lower temp, interp altitude | lower weight, upper temp, interp altitude |
     // +---------------------------------------------------------------------------------------+
-    let comp_mat = [[], []];
+    let comp_mat : number[][] = [[], []];
     comp_mat[0][0] = up_dntemp_bound[1][lower_altitude] + altitude_ratio * (up_dntemp_bound[1][upper_altitude] - up_dntemp_bound[1][lower_altitude]);
     comp_mat[0][1] = up_uptemp_bound[1][lower_altitude] + altitude_ratio * (up_uptemp_bound[1][upper_altitude] - up_uptemp_bound[1][lower_altitude]);
     comp_mat[1][0] = dn_dntemp_bound[1][lower_altitude] + altitude_ratio * (dn_dntemp_bound[1][upper_altitude] - dn_dntemp_bound[1][lower_altitude]);

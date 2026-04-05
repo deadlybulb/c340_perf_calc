@@ -22,14 +22,14 @@
 // These adjustments are in the notes section of the tables in the POH.
 
 class LandingPerformance {
-    speed: number;
-    distance: number;
+    speed: number = 0;
+    distance: number = 0;
 }
 
 export class NormalLandingData {
-    vref: number;
-    groundRoll: number;
-    distanceToClearObstacle: number;
+    vref: number = 0;
+    groundRoll: number = 0;
+    distanceToClearObstacle: number = 0;
 }
 
 const normalLandingGroundRollData = [
@@ -186,7 +186,7 @@ function computeLandingPerformance(srcData : any, landing_weight : number, press
     // +-------------------------------------------+-------------------------------------------+
     // | lower weight, lower temp, interp altitude | lower weight, upper temp, interp altitude |
     // +---------------------------------------------------------------------------------------+
-    let comp_mat = [[], []];
+    let comp_mat : number[][] = [[], []];
     comp_mat[0][0] = up_dntemp_bound[1][lower_altitude] + altitude_ratio * (up_dntemp_bound[1][upper_altitude] - up_dntemp_bound[1][lower_altitude]);
     comp_mat[0][1] = up_uptemp_bound[1][lower_altitude] + altitude_ratio * (up_uptemp_bound[1][upper_altitude] - up_uptemp_bound[1][lower_altitude]);
     comp_mat[1][0] = dn_dntemp_bound[1][lower_altitude] + altitude_ratio * (dn_dntemp_bound[1][upper_altitude] - dn_dntemp_bound[1][lower_altitude]);
