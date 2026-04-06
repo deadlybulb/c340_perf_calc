@@ -35,6 +35,7 @@ export default defineConfig({
                         purpose: 'maskable'
                     }
                 ],
+                // @ts-ignore
                 workbox: {
                     globPatterns: ['**/*.{js,css,html,svg,woff2,png,ico}'],
                     handler: 'NetworkFirst'
